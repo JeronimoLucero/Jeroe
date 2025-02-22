@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+const {VITE_API_URL} = import.meta.env;
 
 const RegisterPage = () => {
   const [username, setUsername] = useState('');
@@ -31,7 +32,7 @@ const RegisterPage = () => {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
+      const response = await axios.post(`${VITE_API_URL}/api/auth/register`, {
         username,
         email,
         password

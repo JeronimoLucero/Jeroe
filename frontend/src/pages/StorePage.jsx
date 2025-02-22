@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaShoppingCart } from 'react-icons/fa'; // Icono de carrito
 import { useAuth } from '../context/AuthContext'; // Suponiendo que tienes un contexto de autenticación
+const {VITE_API_URL} = import.meta.env;
 
 const StorePage = () => {
   const { user, token } = useAuth(); // Obtener usuario y token desde el contexto de autenticación
@@ -13,7 +14,7 @@ const StorePage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/products'); // Asegúrate que la URL sea correcta
+        const response = await fetch(`${VITE_API_URL}/api/products`); // Asegúrate que la URL sea correcta
         if (!response.ok) {
           throw new Error('Error al obtener productos');
         }
@@ -46,7 +47,7 @@ const StorePage = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+      const response = await fetch(`${VITE_API_URL}/api/products/${productId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

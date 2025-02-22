@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';  // Use named import
 import { useNavigate } from 'react-router-dom';
+const {VITE_API_URL} = import.meta.env;
 
 const AdminPage = () => {
   const { user, token } = useAuth();  // Get user and token from context
@@ -30,7 +31,7 @@ const AdminPage = () => {
     }
   
     try {
-      const response = await fetch('http://localhost:5000/api/products', {
+      const response = await fetch(`${VITE_API_URL}/api/products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
