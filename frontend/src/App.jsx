@@ -4,7 +4,7 @@ import AuthProvider from './context/AuthContext';  // This should work now
 import { UserProvider } from './context/UserContext'; // Import UserProvider
 import Navbar from './components/Navbar';
 import Footer from './components/footer';
-import HomePage from './pages/home';
+import HomePage from './pages/HomePage';
 import StorePage from './pages/StorePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
