@@ -11,7 +11,7 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 import NotFoundPage from './pages/NotFoundPage';
-import ProtectedRoute from './components/ProtectedRoute'; // Ruta protegida
+import ProtectedRoute from './components/protectedroute'; // Ruta protegida
 
 const App = () => {
   return (
