@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-import { Link } from 'react-router-dom'; // Importamos Link de React Router
+import { Link } from 'react-router-dom'; 
 
 const HomePage = () => {
   return (
@@ -16,7 +16,7 @@ const HomePage = () => {
               className="object-contain h-20 mx-auto drop-shadow-lg"
             />
             <div>
-              {/* Usamos Link en lugar de un botón regular para la navegación */}
+             
               <Link to="/store">
                 <button className="bg-black text-white px-5 py-2 hover:bg-gray-400 transition mt-6">
                   Visitar Tienda
