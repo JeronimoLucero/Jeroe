@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// **Import AuthProvider as default import**
 import AuthProvider from './context/AuthContext';  // This should work now
 import { UserProvider } from './context/UserContext'; // Import UserProvider
 import Navbar from './components/Navbar';
