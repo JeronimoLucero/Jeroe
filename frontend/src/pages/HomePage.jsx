@@ -8,7 +8,7 @@ const HomePage = () => {
     <>
       <div className="flex flex-col flex-grow">
        
-        <main className="flex-grow flex items-center justify-center bg-[url('src/assets/img/background.jpeg')] bg-opacity-10 bg-cover bg-center p-6">
+        <main className="flex-grow flex items-center justify-center bg-[url('dist/assets/background.jpeg')] bg-opacity-10 bg-cover bg-center p-6">
           <div className="text-center flex flex-col items-between">
             <img
               src="src/assets/img/logomain.png"
