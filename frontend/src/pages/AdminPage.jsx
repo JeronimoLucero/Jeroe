@@ -1,69 +1,118 @@
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext'; // Usamos el contexto de autenticación
-import { useNavigate } from 'react-router-dom'; // Usamos el hook para redirigir
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';  // Use named import
+import { useNavigate } from 'react-router-dom';
 
 const AdminPage = () => {
-  const { user } = useAuth(); // Obtenemos el usuario del contexto
+  const { user, token } = useAuth();  // Get user and token from context
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user || user.role !== 'admin') {
+      navigate('/profile');  // Redirect if not admin
+    }
+  }, [user, navigate]);
+
+  const [nombre, setNombre] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+  const [precio, setPrecio] = useState('');
+  const [urlimagen, setUrlimagen] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleAddProduct = async () => {
+    setError('');
+    setSuccess('');
   
-  // Si el usuario no es administrador, redirigirlo a otra página (por ejemplo, a su perfil)
-  if (!user || user.role !== 'admin') {
-    navigate('/profile'); // Redirigir si no es admin
-    return null; // No renderizar nada si no es admin
-  }
-
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-
-  const handlePublish = () => {
-    // Lógica para subir una publicación
-    console.log('Publicación subida:', { title, description, imageUrl });
-    // Aquí podrías hacer una llamada a la API para subir la publicación
+    // Verificar si el token está disponible
+    if (!token) {
+      setError('No se encontró el token de autenticación');
+      return;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:5000/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,  // Incluir el token en los encabezados
+        },
+        body: JSON.stringify({ nombre, descripcion, precio, urlimagen }), // Cambiado los campos
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al agregar producto');
+      }
+  
+      setSuccess('Producto agregado con éxito');
+      setNombre('');
+      setDescripcion('');
+      setPrecio('');
+      setUrlimagen('');
+    } catch (err) {
+      setError(err.message);
+    }
   };
+  
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
       <h2 className="text-3xl mb-4">Panel de Administración</h2>
+
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      {success && <p className="text-green-500 mb-4">{success}</p>}
+
       <form className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
         <div className="mb-4">
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título</label>
+          <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre del Producto</label>
           <input
             type="text"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            id="nombre"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
             required
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">Descripción</label>
+          <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">Descripción</label>
           <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            id="descripcion"
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
             required
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">URL de Imagen</label>
+          <label htmlFor="precio" className="block text-sm font-medium text-gray-700">Precio</label>
+          <input
+            type="number"
+            id="precio"
+            value={precio}
+            onChange={(e) => setPrecio(e.target.value)}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="urlimagen" className="block text-sm font-medium text-gray-700">URL de Imagen</label>
           <input
             type="text"
-            id="imageUrl"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
+            id="urlimagen"
+            value={urlimagen}
+            onChange={(e) => setUrlimagen(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
             required
           />
         </div>
         <button
           type="button"
-          onClick={handlePublish}
+          onClick={handleAddProduct}
           className="w-full bg-black text-white py-2 rounded-md"
         >
-          Publicar
+          Agregar Producto
         </button>
       </form>
     </div>

@@ -1,35 +1,40 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+// **Import AuthProvider as default import**
+import AuthProvider from './context/AuthContext';  // This should work now
+import { UserProvider } from './context/UserContext'; // Import UserProvider
 import Navbar from './components/Navbar';
-import HomePage from './pages/homepage';
+import Footer from './components/Footer';
+import HomePage from './pages/HomePage';
+import StorePage from './pages/StorePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import StorePage from './pages/StorePage';
 import ProfilePage from './pages/ProfilePage';
-import Footer from './components/footer'
 import AdminPage from './pages/AdminPage';
+import NotFoundPage from './pages/NotFoundPage';
+import ProtectedRoute from './components/ProtectedRoute'; // Ruta protegida
 
 const App = () => {
   return (
-    <AuthProvider>
-      <Router>
-        <div className='min-h-screen flex flex-col'>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/store" element={<StorePage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/admin" element={<AdminPage />} />
-        </Routes>
-        <Footer />
-
-        </div>
-        
-      </Router>
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <UserProvider>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/store" element={<StorePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/profile" element={<ProtectedRoute element={<ProfilePage />} />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+            <Footer />
+          </div>
+        </UserProvider>
+      </AuthProvider>
+    </Router>
   );
 };
 
