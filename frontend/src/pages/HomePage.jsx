@@ -11,7 +11,7 @@ const HomePage = () => {
         <main className="flex-grow flex items-center justify-center bg-[url('img\background.jpeg')] bg-opacity-10 bg-cover bg-center p-6">
           <div className="text-center flex flex-col items-between">
             <img
-              src="frontend\public\logomain.png"
+              src="img\logomain.png"
               alt="Logo"
               className="object-contain h-20 mx-auto drop-shadow-lg"
             />
