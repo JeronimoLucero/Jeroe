@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import background from 'img/background.jpeg'; // Ajusta la ruta según tu estructura de carpetas
+import background from '../../public/img/background.jpeg'; // Ajusta la ruta según tu estructura de carpetas
 
 const HomePage = () => {
   return (
