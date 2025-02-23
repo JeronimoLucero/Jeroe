@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 .backgroundlanding {
-    background-image: url("frontend\public\img\background.jpeg");
+    background-image: url('img\background.jpeg');
     background-size: cover;
 }
 
