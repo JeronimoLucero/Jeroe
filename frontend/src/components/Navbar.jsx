@@ -17,7 +17,7 @@ const Navbar = () => {
       <div className="flex justify-between items-center">
         <div>
           {!isHomePage && (
-            <img src="frontend\public\logonav.png" alt="Logo" className="h-5" />
+            <img src="img\logonav.png" alt="Logo" className="h-5" />
           )}
         </div>
 
