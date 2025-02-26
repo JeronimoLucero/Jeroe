@@ -13,6 +13,7 @@ import AdminPage from './pages/AdminPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/protectedroute'; // Ruta protegida
 
+
 const App = () => {
   return (
     <Router>

@@ -45,7 +45,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-router.put('/:id', verifyToken, isAdmin, async (req, res) => {
+router.put('/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { nombre, descripcion, precio, urlimagen } = req.body;
     const productId = req.params.id;
