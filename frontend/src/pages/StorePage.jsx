@@ -68,46 +68,46 @@ const StorePage = () => {
     }
   };
 
-  // Función para editar un producto
-  const handleEditProduct = async (editProduct) => {
-    if (!token) {
-      alert("No estás autorizado para editar productos");
-      return;
-    }
+  /// Función para editar un producto
+const handleEditProduct = async (product) => {
+  if (!token) {
+    alert("No estás autorizado para editar productos");
+    return;
+  }
 
-    const editFormData = {
-      nombre: editProduct.nombre,
-      descripcion: editProduct.descripcion,
-      precio: editProduct.precio,
-      urlimagen: editProduct.urlimagen,
-    };
-
-    try {
-      const response = await fetch(`${VITE_API_URL}/api/products/${editProduct.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(editFormData), // Enviar los datos del producto actualizado
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al editar producto');
-      }
-
-      // Actualizar el producto en el estado
-      setProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === editProduct.id ? { ...product, ...editFormData } : product
-        )
-      );
-    } catch (error) {
-      console.error('Error al editar producto:', error);
-      alert(error.message);
-    }
+  const editFormData = {
+    nombre: product.nombre,
+    descripcion: product.descripcion,
+    precio: product.precio,
+    urlimagen: product.urlimagen,
   };
+
+  try {
+    const response = await fetch(`${VITE_API_URL}/api/products/${product.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(editFormData), // Enviar los datos del producto actualizado
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al editar producto');
+    }
+
+    // Actualizar el producto en el estado
+    setProducts((prevProducts) =>
+      prevProducts.map((p) =>
+        p.id === product.id ? { ...p, ...editFormData } : p
+      )
+    );
+  } catch (error) {
+    console.error('Error al editar producto:', error);
+    alert(error.message);
+  }
+};
 
   // Si está cargando, mostramos un mensaje
   if (loading) {
