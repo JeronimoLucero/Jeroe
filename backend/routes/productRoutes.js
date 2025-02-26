@@ -45,6 +45,34 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   }
 });
 
+router.put('/:id', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { nombre, descripcion, precio, urlimagen } = req.body;
+    const productId = req.params.id;
+
+    // Buscar el producto en la base de datos
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
+    }
+
+    // Actualizar los campos del producto
+    product.nombre = nombre || product.nombre;
+    product.descripcion = descripcion || product.descripcion;
+    product.precio = precio || product.precio;
+    product.urlimagen = urlimagen || product.urlimagen;
+
+    // Guardar los cambios en la base de datos
+    await product.save();
+
+    // Enviar el producto actualizado como respuesta
+    res.status(200).json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al actualizar el producto' });
+  }
+});
 
 // 📌 **Obtener todos los productos**
 router.get('/', async (req, res) => {
