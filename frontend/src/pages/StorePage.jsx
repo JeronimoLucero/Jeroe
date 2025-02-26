@@ -9,6 +9,15 @@ const StorePage = () => {
   const [loading, setLoading] = useState(true); // Estado para manejar la carga de los productos
   const [error, setError] = useState(null); // Estado para manejar errores
   const [addCartMessage, setAddCartMessage] = useState(''); // Estado para mostrar mensaje de carrito
+  
+  // Estado para el formulario de edición
+  const [editProduct, setEditProduct] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    nombre: '',
+    descripcion: '',
+    precio: 0,
+    urlimagen: '',
+  });
 
   // Obtener productos de la API
   useEffect(() => {
@@ -20,7 +29,6 @@ const StorePage = () => {
         }
 
         const data = await response.json(); // Asegurarnos de que el response sea convertido a JSON
-        console.log('Productos recibidos:', data);  // Log para verificar los productos en consola
         setProducts(data); // Guardamos los productos en el estado
       } catch (error) {
         console.error('Error al obtener los productos:', error);
@@ -69,6 +77,66 @@ const StorePage = () => {
     }
   };
 
+  // Función para manejar la edición de un producto
+  const handleEditProduct = (product) => {
+    setEditProduct(product); // Establecer el producto a editar
+    setEditFormData({
+      nombre: product.nombre,
+      descripcion: product.descripcion,
+      precio: product.precio,
+      urlimagen: product.urlimagen,
+    });
+  };
+
+  // Función para manejar el cambio de los datos en el formulario de edición
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // Función para enviar la actualización del producto al backend
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+
+    if (!token) {
+      alert("No estás autorizado para editar productos");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${VITE_API_URL}/api/products/${editProduct.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(editFormData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al actualizar producto');
+      }
+
+      // Actualizamos el estado con el producto modificado
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === editProduct.id ? { ...product, ...editFormData } : product
+        )
+      );
+
+      // Cerrar formulario de edición
+      setEditProduct(null);
+    } catch (error) {
+      console.error('Error al actualizar producto:', error);
+      alert(error.message);
+    }
+  };
+
   // Si está cargando, mostramos un mensaje
   if (loading) {
     return <div className="flex justify-center items-center">Cargando productos...</div>;
@@ -107,12 +175,21 @@ const StorePage = () => {
 
               {/* Mostrar el botón de eliminar solo si es admin */}
               {user && user.role === 'admin' && (
-                <button
-                  onClick={() => handleDeleteProduct(product.id)}
-                  className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
-                >
-                  Eliminar
-                </button>
+                <>
+                  <button
+                    onClick={() => handleDeleteProduct(product.id)}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
+                  >
+                    Eliminar
+                  </button>
+
+                  <button
+                    onClick={() => handleEditProduct(product)}
+                    className="absolute top-2 left-2 bg-yellow-500 text-white p-2 rounded-full hover:bg-yellow-600"
+                  >
+                    Editar
+                  </button>
+                </>
               )}
             </div>
           ))
@@ -120,6 +197,67 @@ const StorePage = () => {
           <div className="text-center col-span-full">No hay productos disponibles</div>
         )}
       </div>
+
+      {/* Modal de edición */}
+      {editProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+            <h3 className="text-2xl mb-4">Editar Producto</h3>
+            <form onSubmit={handleSaveEdit}>
+              <label className="block mb-2">Nombre:</label>
+              <input
+                type="text"
+                name="nombre"
+                value={editFormData.nombre}
+                onChange={handleEditChange}
+                className="w-full p-2 border rounded mb-4"
+                required
+              />
+              <label className="block mb-2">Descripción:</label>
+              <textarea
+                name="descripcion"
+                value={editFormData.descripcion}
+                onChange={handleEditChange}
+                className="w-full p-2 border rounded mb-4"
+                required
+              />
+              <label className="block mb-2">Precio:</label>
+              <input
+                type="number"
+                name="precio"
+                value={editFormData.precio}
+                onChange={handleEditChange}
+                className="w-full p-2 border rounded mb-4"
+                required
+              />
+              <label className="block mb-2">URL Imagen:</label>
+              <input
+                type="text"
+                name="urlimagen"
+                value={editFormData.urlimagen}
+                onChange={handleEditChange}
+                className="w-full p-2 border rounded mb-4"
+                required
+              />
+              <div className="flex justify-between mt-4">
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                >
+                  Guardar Cambios
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditProduct(null)}
+                  className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

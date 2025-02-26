@@ -1,18 +1,18 @@
-// src/context/ProductContext.js
-import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Crear el contexto
+import React, { createContext, useContext, useState, useEffect } from 'react';
+const {VITE_API_URL} = import.meta.env;
+
 const ProductContext = createContext();
 
-// Crear el proveedor del contexto
+
 export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    // Aquí podrías hacer una solicitud HTTP para obtener los productos
+   
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/products'); // Aquí pondrías tu URL de API
+        const response = await fetch(`${VITE_API_URL}/api/products`); 
         const data = await response.json();
         setProducts(data);
       } catch (error) {
@@ -30,5 +30,4 @@ export const ProductProvider = ({ children }) => {
   );
 };
 
-// Hook para acceder al contexto
 export const useProducts = () => useContext(ProductContext);
