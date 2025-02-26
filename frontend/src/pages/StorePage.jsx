@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaShoppingCart } from 'react-icons/fa'; // Icono de carrito
 import { useAuth } from '../context/AuthContext'; // Suponiendo que tienes un contexto de autenticación
-const {VITE_API_URL} = import.meta.env;
+const { VITE_API_URL } = import.meta.env;
 
 const StorePage = () => {
   const { user, token } = useAuth(); // Obtener usuario y token desde el contexto de autenticación
@@ -9,21 +9,13 @@ const StorePage = () => {
   const [loading, setLoading] = useState(true); // Estado para manejar la carga de los productos
   const [error, setError] = useState(null); // Estado para manejar errores
   const [addCartMessage, setAddCartMessage] = useState(''); // Estado para mostrar mensaje de carrito
-  
-  // Estado para el formulario de edición
-  const [editProduct, setEditProduct] = useState(null);
-  const [editFormData, setEditFormData] = useState({
-    nombre: '',
-    descripcion: '',
-    precio: 0,
-    urlimagen: '',
-  });
 
   // Obtener productos de la API
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(`${VITE_API_URL}/api/products`); // Asegúrate que la URL sea correcta
+
         if (!response.ok) {
           throw new Error('Error al obtener productos');
         }
@@ -63,10 +55,9 @@ const StorePage = () => {
         },
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.message || 'Error al eliminar producto');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al eliminar producto');
       }
 
       // Eliminar el producto del estado
@@ -77,34 +68,19 @@ const StorePage = () => {
     }
   };
 
-  // Función para manejar la edición de un producto
-  const handleEditProduct = (product) => {
-    setEditProduct(product); // Establecer el producto a editar
-    setEditFormData({
-      nombre: product.nombre,
-      descripcion: product.descripcion,
-      precio: product.precio,
-      urlimagen: product.urlimagen,
-    });
-  };
-
-  // Función para manejar el cambio de los datos en el formulario de edición
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setEditFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Función para enviar la actualización del producto al backend
-  const handleSaveEdit = async (e) => {
-    e.preventDefault();
-
+  // Función para editar un producto
+  const handleEditProduct = async (editProduct) => {
     if (!token) {
       alert("No estás autorizado para editar productos");
       return;
     }
+
+    const editFormData = {
+      nombre: editProduct.nombre,
+      descripcion: editProduct.descripcion,
+      precio: editProduct.precio,
+      urlimagen: editProduct.urlimagen,
+    };
 
     try {
       const response = await fetch(`${VITE_API_URL}/api/products/${editProduct.id}`, {
@@ -113,26 +89,22 @@ const StorePage = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(editFormData),
+        body: JSON.stringify(editFormData), // Enviar los datos del producto actualizado
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.message || 'Error al actualizar producto');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al editar producto');
       }
 
-      // Actualizamos el estado con el producto modificado
+      // Actualizar el producto en el estado
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
           product.id === editProduct.id ? { ...product, ...editFormData } : product
         )
       );
-
-      // Cerrar formulario de edición
-      setEditProduct(null);
     } catch (error) {
-      console.error('Error al actualizar producto:', error);
+      console.error('Error al editar producto:', error);
       alert(error.message);
     }
   };
@@ -159,7 +131,11 @@ const StorePage = () => {
         {products.length > 0 ? (
           products.map((product) => (
             <div key={product.id} className="bg-white p-3 text-center shadow-md hover:shadow-sm relative">
-              <img src={product.urlimagen} alt={product.nombre} className="w-full h-72 object-contain rounded-lg mb-4" />
+              <img
+                src={product.urlimagen}
+                alt={product.nombre}
+                className="w-full h-72 object-contain rounded-lg mb-4"
+              />
               <h3 className="text-xl font-bold">{product.nombre}</h3>
               <p className="text-gray-700 mb-4">{product.descripcion}</p>
               <h4>${product.precio}</h4>
@@ -175,21 +151,20 @@ const StorePage = () => {
 
               {/* Mostrar el botón de eliminar solo si es admin */}
               {user && user.role === 'admin' && (
-                <>
+                <div>
                   <button
                     onClick={() => handleDeleteProduct(product.id)}
                     className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
                   >
                     Eliminar
                   </button>
-
                   <button
                     onClick={() => handleEditProduct(product)}
-                    className="absolute top-2 left-2 bg-yellow-500 text-white p-2 rounded-full hover:bg-yellow-600"
+                    className="absolute bottom-2 right-2 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600"
                   >
                     Editar
                   </button>
-                </>
+                </div>
               )}
             </div>
           ))
@@ -197,67 +172,6 @@ const StorePage = () => {
           <div className="text-center col-span-full">No hay productos disponibles</div>
         )}
       </div>
-
-      {/* Modal de edición */}
-      {editProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-            <h3 className="text-2xl mb-4">Editar Producto</h3>
-            <form onSubmit={handleSaveEdit}>
-              <label className="block mb-2">Nombre:</label>
-              <input
-                type="text"
-                name="nombre"
-                value={editFormData.nombre}
-                onChange={handleEditChange}
-                className="w-full p-2 border rounded mb-4"
-                required
-              />
-              <label className="block mb-2">Descripción:</label>
-              <textarea
-                name="descripcion"
-                value={editFormData.descripcion}
-                onChange={handleEditChange}
-                className="w-full p-2 border rounded mb-4"
-                required
-              />
-              <label className="block mb-2">Precio:</label>
-              <input
-                type="number"
-                name="precio"
-                value={editFormData.precio}
-                onChange={handleEditChange}
-                className="w-full p-2 border rounded mb-4"
-                required
-              />
-              <label className="block mb-2">URL Imagen:</label>
-              <input
-                type="text"
-                name="urlimagen"
-                value={editFormData.urlimagen}
-                onChange={handleEditChange}
-                className="w-full p-2 border rounded mb-4"
-                required
-              />
-              <div className="flex justify-between mt-4">
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-                >
-                  Guardar Cambios
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditProduct(null)}
-                  className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
-                >
-                  Cancelar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
